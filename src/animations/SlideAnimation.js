@@ -3,15 +3,23 @@
 import { Animated, Dimensions } from 'react-native';
 import Animation, { type AnimationConfig } from './Animation';
 
+const {
+  width: SCREEN_WIDTH,
+  height: SCREEN_HEIGHT,
+} = Dimensions.get('window');
+
 type SlideFrom = 'top' | 'bottom' | 'left' | 'right';
 type SlideAnimationConfig = AnimationConfig & {
   slideFrom?: SlideFrom,
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 export default class SlideAnimation extends Animation {
-  slideFrom: SlideFrom
+  slideFrom: SlideFrom;
+
+  static SLIDE_FROM_TOP = 'top';
+  static SLIDE_FROM_BOTTOM = 'bottom';
+  static SLIDE_FROM_LEFT = 'left';
+  static SLIDE_FROM_RIGHT = 'right';
 
   constructor({
     initialValue = 0,
@@ -51,30 +59,31 @@ export default class SlideAnimation extends Animation {
           outputRange: [-SCREEN_HEIGHT, 0],
         }),
       });
-    }
-    if (this.slideFrom === 'bottom') {
+    } else if (this.slideFrom === 'bottom') {
       transform.push({
         translateY: this.animate.interpolate({
           inputRange: [0, 1],
           outputRange: [SCREEN_HEIGHT, 0],
         }),
       });
-    }
-    if (this.slideFrom === 'left') {
+    } else if (this.slideFrom === 'left') {
       transform.push({
         translateX: this.animate.interpolate({
           inputRange: [0, 1],
           outputRange: [-SCREEN_WIDTH, 0],
         }),
       });
-    }
-    if (this.slideFrom === 'right') {
+    } else if (this.slideFrom === 'right') {
       transform.push({
         translateX: this.animate.interpolate({
           inputRange: [0, 1],
           outputRange: [SCREEN_WIDTH, 0],
         }),
       });
+    } else {
+      throw new Error(`
+        slideFrom: ${this.slideFrom} not supported. 'slideFrom' must be 'top' | 'bottom' | 'left' | 'right'
+      `);
     }
     return {
       transform,
